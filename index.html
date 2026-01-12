@@ -1,0 +1,2065 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catálogo semanal – Calzados Brasileros</title>
+  <meta name="description" content="Catálogo semanal para pedidos por WhatsApp." />
+
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#0f1620;
+      --panel2:#0c121a;
+      --text:#e9eef6;
+      --muted:#a7b4c7;
+      --border:rgba(255,255,255,.10);
+      --btn:#153a2c;
+      --btn2:#1b4a36;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+      background: radial-gradient(1200px 600px at 50% -80px, rgba(40,80,120,.30), transparent 60%),
+                  radial-gradient(900px 500px at 20% 0, rgba(40,120,80,.18), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: rgba(11,15,20,.85);
+      border-bottom: 1px solid var(--border);
+    }
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px 14px;
+    }
+    .title{
+      font-size: clamp(20px, 4.3vw, 34px);
+      line-height: 1.15;
+      margin: 2px 0 8px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .subtitle{
+      margin:0;
+      color: var(--muted);
+      font-size: 13.5px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .subtitle span{
+      opacity:.95;
+      white-space: nowrap;
+    }
+
+    main{padding: 10px 14px 24px}
+    .container{
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .controls{
+      margin-top: 12px;
+      display:grid;
+      gap: 10px;
+    }
+    .row3{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 700px){
+      .row3{grid-template-columns: 1fr 1fr 1fr;}
+    }
+
+    .input, select{
+      width:100%;
+      border:1px solid var(--border);
+      background: rgba(15,22,32,.65);
+      color: var(--text);
+      padding: 13px 14px;
+      border-radius: 14px;
+      outline:none;
+      box-shadow: 0 1px 0 rgba(255,255,255,.03) inset;
+    }
+    .input::placeholder{color:rgba(167,180,199,.75)}
+    select{appearance:none}
+
+    /* ✨ GRID COMPACTO + CUADRADITOS */
+    .grid{
+      margin-top: 14px;
+      display:grid;
+      gap: 12px;
+      grid-template-columns: 1fr; /* celu */
+    }
+    @media (min-width: 600px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 980px){
+      .grid{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+    @media (max-width: 520px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(15,22,32,.70), rgba(12,18,26,.75));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(120,220,160,.28);
+      box-shadow: 0 18px 45px rgba(0,0,0,.42);
+    }
+
+    .hero{
+      position: relative;
+      background: #05080d;
+      aspect-ratio: 1 / 1; /* más cuadrado */
+      overflow:hidden;
+      cursor:pointer;
+    }
+    .hero img, .hero video{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+      transform: scale(1.01);
+    }
+    .hero video{
+      transform: none;
+    }
+
+    .thumbs{
+      display:flex;
+      gap:8px;
+      padding: 8px 10px 0;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .thumbs::-webkit-scrollbar{height:8px}
+    .thumbs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12); border-radius:999px}
+    .thumb{
+      flex: 0 0 auto;
+      width: 48px;
+      height: 38px;
+      border-radius: 10px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      opacity: .82;
+      cursor:pointer;
+      background:#05080d;
+      position: relative;
+    }
+    .thumb.active{
+      opacity: 1;
+      border-color: rgba(120,220,160,.65);
+      box-shadow: 0 0 0 2px rgba(120,220,160,.18);
+    }
+    .thumb img, .thumb video{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .playBadge{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.18);
+      font-size: 16px;
+      pointer-events:none;
+    }
+
+    .content{
+      padding: 10px 12px 12px;
+    }
+
+    .tagrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin: 8px 0 10px;
+    }
+    .tag{
+      font-size: 11.5px;
+      color: rgba(233,238,246,.92);
+      border: 1px solid rgba(255,255,255,.11);
+      background: rgba(10,14,20,.35);
+      padding: 6px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .name{
+      margin: 6px 0 6px;
+      font-size: 16.5px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .note{
+      margin:0 0 10px;
+      color: var(--muted);
+      font-size: 12.5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .priceRow{
+      display:flex;
+      justify-content:space-between;
+      gap: 14px;
+      align-items:flex-end;
+      padding: 8px 0 10px;
+      border-top: 1px dashed rgba(255,255,255,.12);
+      margin-top: 8px;
+    }
+    .priceLabel{
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .price{
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing:.3px;
+    }
+    .rightHint{
+      text-align:right;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.25;
+    }
+
+    /* ✅ Fix: en cards angostas, que no se recorte el texto */
+    @media (max-width: 520px){
+      .priceRow{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .rightHint{
+        text-align: left;
+        font-size: 12px;
+        line-height: 1.3;
+        opacity: .9;
+      }
+    }
+
+    .btn{
+      width:100%;
+      border: 1px solid rgba(120,220,160,.22);
+      background: linear-gradient(180deg, var(--btn2), var(--btn));
+      color: #eafff2;
+      font-weight: 850;
+      font-size: 15px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    }
+    .btn:active{transform: translateY(1px)}
+
+    footer{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 14px 30px;
+      color: rgba(167,180,199,.75);
+      font-size: 12.5px;
+      text-align:center;
+    }
+
+    /* Modal */
+    .modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 50;
+      padding: 16px;
+    }
+    .modal.open{display:flex}
+    .modalBox{
+      width:min(980px, 100%);
+      border-radius: 18px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(10,14,20,.92);
+      box-shadow: 0 30px 80px rgba(0,0,0,.55);
+    }
+    .modalTop{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      color: rgba(233,238,246,.92);
+      font-size: 13px;
+    }
+    .xbtn{
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.18);
+      color: rgba(233,238,246,.9);
+      border-radius: 12px;
+      padding: 7px 10px;
+      cursor:pointer;
+    }
+    .modalMedia{
+      width:100%;
+      height: min(72vh, 620px);
+      background:#05080d;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      touch-action: pan-y; /* permite scroll vertical del navegador, pero swipe horizontal lo manejamos nosotros */
+    }
+    .modalMedia img, .modalMedia video{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
+    }
+    .modalThumbs{
+      display:flex;
+      gap:10px;
+      padding: 12px;
+      overflow:auto;
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <h1 class="title">Catálogo semanal – Calzados Importados Premium</h1>
+      <p class="subtitle">
+        <span>Ingresos de la semana</span>
+        <span>·</span>
+        <span>Stock limitado</span>
+        <span>·</span>
+        <span>Solo por encargo</span>
+        <span>·</span>
+        <span>Talles Brasileros</span>
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="controls">
+        <input id="q" class="input" placeholder="Buscar (ej: ojotas, mujer, infantil, botines...)" />
+
+        <div class="row3">
+          <select id="cat">
+            <option value="">Todas las categorías</option>
+          </select>
+
+          <select id="type">
+            <option value="">Todos los tipos</option>
+          </select>
+
+          <select id="brand">
+            <option value="">Todas las marcas</option>
+          </select>
+        </div>
+      </section>
+
+      <section id="grid" class="grid"></section>
+    </div>
+  </main>
+
+  <footer>
+    Pedidos por WhatsApp: <strong>11 6724-8975</strong>
+  </footer>
+
+  <!-- Modal galería (fotos + videos) -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modalBox">
+      <div class="modalTop">
+        <div id="modalTitle">Galería</div>
+        <button class="xbtn" id="closeModal">Cerrar ✕</button>
+      </div>
+
+      <!-- 👇 acá se renderiza IMG o VIDEO -->
+      <div id="modalMedia" class="modalMedia"></div>
+
+      <div id="modalThumbs" class="modalThumbs"></div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Tu WhatsApp (con prefijo país Argentina 54)
+    const WHATSAPP_NUMBER = "5491167248975";
+
+    // =============================
+    // ✅ PRODUCTOS (ejemplo 1 solo)
+    // Para agregar videos: meté un .mp4 dentro de images[]
+    // =============================
+    const PRODUCTS = [
+
+    {
+    id: "83",
+    name: "Adidas Samba infantil",
+    category: "Infantil",
+    type: "Zapatilla",
+    price: 29000,
+    note: "Talles en cada foto", 
+    images: [
+      "Adidas Samba infantil 1.jpeg",
+      "Adidas Samba infantil 2.jpeg",
+      "Adidas Samba infantil 3.jpeg", 
+      "Adidas Samba infantil 4.jpeg",
+    ]
+  },
+
+     {
+    id: "82",
+    name: "Adidas Supernova infantil",
+    category: "Infantil",
+    type: "Zapatilla",
+    price: 31000,
+    note: "Talles en cada foto", 
+    images: [
+      "Adidas Supernova infantil 1.jpeg",
+      "Adidas Supernova infantil 2.jpeg",
+      "Adidas Supernova infantil 3.jpeg", 
+    ]
+  },
+
+     {
+    id: "81",
+    name: "Nike air zoom",
+    category: "Hombre",
+    type: "Zapatilla",
+    price: 35000,
+    note: "Talles del 38 al 43", 
+    images: [
+      "Nike air zoom 4.jpeg", 
+      "Nike air zoom 5.jpeg",
+    ]
+  },
+
+    {
+    id: "80",
+    name: "Nike Infinity run 4",
+    category: "Hombre/Mujer",
+    type: "Zapatillas",
+    price: 35000,
+    note: "Talles del 34 al 39", 
+    images: [
+     "Nike Infinity run 4 1.jpeg", 
+     "Nike Infinity run 4 2.jpeg",
+     "Nike Infinity run 4 3.jpeg",
+     "Nike Infinity run 4 4.jpeg", 
+    ]
+  },
+
+    {
+    id: "79",
+    name: "Nike running",
+    category: "Hombre/Mujer",
+    type: "Zapatillas",
+    price: 35000,
+    note: "Talles en cada foto", 
+    images: [
+     "Nike running 1.jpeg", 
+     "Nike running 2.jpeg",
+     "Nike running 3.jpeg",
+     "Nike running 4.jpeg", 
+    ]
+  },
+
+    {
+    id: "78",
+    name: "Zapatillas infantil",
+    category: "Infantil",
+    type: "Zapatillas",
+    price: 25000,
+    note: "Talles del 26 al 33", 
+    images: [
+     "Zapatillas infantil 1.jpeg", 
+     "Zapatillas infantil 2.jpeg",
+     "Zapatillas infantil 3.jpeg",
+     "Zapatillas infantil 4.jpeg",
+     "Zapatillas infantil 5.jpeg",
+     "Zapatillas infantil 6.jpeg", 
+    ]
+  },
+
+     {
+    id: "77",
+    name: "Dunk low swhoosh",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 37000,
+    note: "Talles en cada foto", 
+    images: [
+     "Dunk low swhoosh 1.jpeg", 
+     "Dunk low swhoosh 2.jpeg", 
+    ]
+  },
+
+     {
+    id: "76",
+    name: "Vans skun",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 40200,
+    note: "Talles en cada foto", 
+    images: [
+     "Vans skun 1.jpeg", 
+     "Vans skun 2.jpeg", 
+     "Vans skun 3.jpeg", 
+     "Vans skun 4.jpeg",
+    ]
+  },
+
+      {
+    id: "75",
+    name: "Boxion shoes",
+    category: "Mujer",
+    type: "Zapatillas",
+    price: 35000,
+    note: "Talles en cada foto", 
+    images: [
+     "Boxion shoes 1.jpeg", 
+     "Boxion shoes 2.jpeg", 
+     "Boxion shoes 3.jpeg", 
+    ]
+  },
+
+     {
+    id: "74",
+    name: "Botin suizo",
+    category: "Hombre",
+    type: "Botines",
+    price: 31000,
+    note: "Talles en cada foto", 
+    images: [
+     "Botin suizo 1.jpeg", 
+     "Botin suizo 2.jpeg", 
+    ]
+  },
+
+    {
+    id: "73",
+    name: "Adidas Blancas",
+    category: "Mujer",
+    type: "Zapatilla",
+    price: 53000,
+    note: "Talles 34 al 39", 
+    images: [
+     "Zapatillas adidas blancas 2.jpeg", 
+    ]
+  },
+
+     {
+    id: "72",
+    name: "Beira rio original",
+    category: "Mujer",
+    type: "Zandalias",
+    price: 46500,
+    note: "Talles del 35 al 40", 
+    images: [
+    "Beira rio original 1.jpeg",
+    "Beira rio original 2.jpeg",
+    ]
+  },
+
+     {
+    id: "71",
+    name: "NIKE DNSUB",
+    category: "Hombre/Mujer",
+    type: "Zapatillas",
+    price: 57000,
+    note: "Talles del 35 al 40", 
+    images: [
+    "NIKE DNSUB 1.jpeg",
+    "NIKE DNSUB 2.jpeg",
+    "NIKE DNSUB 3.jpeg",
+    "NIKE DNSUB 4.jpeg",
+    "NIKE DNSUB 5.jpeg",
+    "NIKE DNSUB 6.jpeg",
+    "NIKE DNSUB 7.jpeg",
+    "NIKE DNSUB 8.jpeg",
+    ]
+  },
+
+  {
+    id: "70",
+    name: "Nike Air Max EDIT",
+    category: "Hombre",
+    type: "Zapatillas",
+    price: 55000,
+    note: "Talles del 38 al 43", 
+    images: [
+    "Nike Air Max EDIT 1.jpeg",
+    "Nike Air Max EDIT 2.jpeg",
+    "Nike Air Max EDIT 3.jpeg",
+    "Nike Air Max EDIT 4.jpeg",
+    ]
+  },
+
+         {
+    id: "69",
+    name: "Nike Air Max DN8",
+    category: "Hombre",
+    type: "Zapatillas",
+    price: 55000,
+    note: "Talles del 38 al 43", 
+    images: [
+    "Nike Air Max DN8 1.jpeg",
+    "Nike Air Max DN8 2.jpeg",
+    ]
+  },
+
+     {
+    id: "68",
+    name: "NIKE AIR MAX TN 2",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 45000,
+    note: "Talles del 38 al 43", 
+    images: [
+    "NIKE AIR MAX TN 2 1.jpeg",
+    "NIKE AIR MAX TN 2 2.jpeg",
+    "NIKE AIR MAX TN 2 3.jpeg",
+    "NIKE AIR MAX TN 2 4.jpeg",
+     "NIKE AIR MAX TN 2 5.jpeg",
+    "NIKE AIR MAX TN 2 6.jpeg",
+    "NIKE AIR MAX TN 2 7.jpeg",
+    "NIKE AIR MAX TN 2 8.jpeg",
+     "NIKE AIR MAX TN 2 9.jpeg",
+    "NIKE AIR MAX TN 2 10.jpeg",
+    "NIKE AIR MAX TN 2 11.jpeg",
+    "NIKE AIR MAX TN 2 12.jpeg",
+     "NIKE AIR MAX TN 2 13.jpeg",
+    "NIKE AIR MAX TN 2 14.jpeg",
+    "NIKE AIR MAX TN 2 15.jpeg",
+    "NIKE AIR MAX TN 2 16.jpeg",
+     "NIKE AIR MAX TN 2 17.jpeg",
+     "NIKE AIR MAX TN 2 18.jpeg",
+     "NIKE AIR MAX TN 2 19.jpeg",
+    ]
+  },
+
+      {
+    id: "67",
+    name: "Zapatilla Vancy Blanca",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 37000,
+    note: "Talles del 38 al 43", 
+    images: [
+    "Zapatilla Vancy Blanca 1.jpeg",
+    ]
+  },
+
+      {
+    id: "66",
+    name: "Vans Hylane",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 32200,
+    note: "Talles del 38 al 43", 
+    images: [
+    "Vans Hylane 1.jpeg",
+    "Vans Hylane 2.jpeg",
+    "Vans Hylane 3.jpeg",
+    ]
+  },
+
+       {
+    id: "65",
+    name: "Ojotas",
+    category: "Mujer",
+    type: "Ojotas Nike/Adidas",
+    price: 53000,
+    note: "Talles en cada foto", 
+    images: [
+   "Ojotas negras nike y adidas 1.jpeg",
+    "Ojotas negras nike y adidas 2.jpeg",
+    "Ojotas negras nike y adidas 3.jpeg",
+    ]
+  },
+
+      {
+    id: "64",
+    name: "Quiz Corcho original",
+    category: "Mujer",
+    type: "Zandalias",
+    price: 53000,
+    note: "Talles del 35 al 39", 
+    images: [
+      "Quiz Corcho original 1.jpeg",
+     "Quiz Corcho original 2.jpeg",
+     "Quiz Corcho original 3.jpeg",
+     "Quiz Corcho original 4.jpeg",
+     "Quiz Corcho original 5.jpeg",
+     "Quiz Corcho original 6.jpeg",
+    ]
+  },
+
+    {
+    id: "63",
+    name: "Zandalias Moleca",
+    category: "Mujer",
+    type: "Zandalias",
+    price: 40200,
+    note: "Talles del 35 al 39", 
+    images: [
+    "Molecaa21 1.jpeg",
+    "Molecaa21 2.jpeg",
+    ]
+  },
+
+    {
+    id: "62",
+    name: "Puma eco cuero",
+    category: "Hombre/Mujer",
+    type: "Zapatilla",
+    price: 32200,
+    note: "Talles en cada foto", 
+    images: [
+     "Zapatilla Puma eco cuero 1.jpeg",
+     "Zapatilla Puma eco cuero 2.jpeg", 
+     "Zapatilla Puma eco cuero 3.jpeg", 
+     "Zapatilla Puma eco cuero 4.jpeg", 
+     "Zapatilla Puma eco cuero 5.jpeg",  
+    ]
+  },
+
+         {
+    id: "61",
+    name: "JORDAN 2 LOW",
+    category: "Hombre",
+    type: "Zapatilla",
+    price: 53000,
+    note: "Talles del 40 al 43", 
+    images: [
+     "JORDAN 2 LOW 1.jpeg", 
+     "JORDAN 2 LOW 2.jpeg", 
+     "JORDAN 2 LOW 3.jpeg",
+    ]
+  },
+
+        {
+    id: "60",
+    name: "Vans SLIP-ON",
+    category: "Mujer/Hombre",
+    type: "Sin cordones",
+    price: 35000,
+    note: "Talles del 34 al 43", 
+    images: [
+     "Vans sin cordon 1.jpeg", 
+     "Vans sin cordon 2.jpeg", 
+     "Vans sin cordon 3.jpeg",
+    ]
+  },
+
+     {
+    id: "59",
+    name: "Adidas campus",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 33000,
+    note: "Talles del 34 al 43", 
+    images: [
+     "Adidas campus 1.jpeg", 
+     "Adidas campus 2.jpeg", 
+     "Adidas campus 3.jpeg",
+    ]
+  },
+
+     {
+    id: "59",
+    name: "Borcegos caterpillar",
+    category: "Mujer/Hombre",
+    type: "Borcegos",
+    price: 41000,
+    note: "Talles en cada foto", 
+    images: [
+     "Borcegos caterpillar 1.jpeg", 
+     "Borcegos caterpillar 2.jpeg", 
+    ]
+  },
+
+    {
+    id: "58",
+    name: "Botas caterpillar ",
+    category: "Mujer/Hombre",
+    type: "Botas",
+    price: 41000,
+    note: "Talles en cada foto", 
+    images: [
+     "Botas caterpillar 1.jpeg", 
+     "Botas caterpillar 2.jpeg", 
+     "Botas caterpillar 3.jpeg", 
+    ]
+  },
+
+         {
+    id: "57",
+    name: "Borcego con punta de pvc",
+    category: "Mujer/Hombre",
+    type: "Borcego",
+    price: 43000,
+    note: "Talles 38 al 45", 
+    images: [
+     "BorcegoConPuntaDePVC.jpeg", 
+    ]
+  },
+
+        {
+    id: "56",
+    name: "Adidas Blancas",
+    category: "Mujer/Hombre",
+    type: "Zapatilla",
+    price: 33000,
+    note: "Talles 40 al 43", 
+    images: [
+     "ZapatillasAdidasBlancas.jpeg", 
+    ]
+  },
+
+       {
+    id: "55",
+    name: "CONVER OFERTAS",
+    category: "Mujer",
+    type: "Zapatilla",
+    price: 32000,
+    note: "Talles en cada foto- Ultimos talles- Stock limitado", 
+    images: [
+     "CONVEROFERTAS1.jpeg", 
+     "CONVEROFERTAS2.jpeg", 
+     "CONVEROFERTAS3.jpeg", 
+     "CONVEROFERTAS4.jpeg", 
+    ]
+  },
+
+       {
+    id: "54",
+    name: "Nike marron",
+    category: "Hombre",
+    type: "Zapatilla",
+    price: 33000,
+    note: "Talles del 38 al 43", 
+    images: [
+     "Zapatilla nike marron.jpeg", 
+    ]
+  },
+
+     {
+    id: "54",
+    name: "Nike sin cordon",
+    category: "Mujer/Hombre",
+    type: "Zapatilla",
+    price: 31000,
+    note: "Talles del 34 al 43", 
+    images: [
+      "Nike sin cordon 1.jpeg", 
+      "Nike sin cordon 2.jpeg",
+      "Nike sin cordon 3.jpeg",
+      "Nike sin cordon 4.jpeg", 
+ 
+    ]
+  },
+
+    {
+    id: "53",
+    name: "Nike air zoom",
+    category: "Mujer/Hombre",
+    type: "Zapatilla",
+    price: 31000,
+    note: "Talles del 38 al 43", 
+    images: [
+      "Nike air zoom 1.jpeg", 
+      "Nike air zoom 2.jpeg",
+      "Nike air zoom 3.jpeg",
+    ]
+  },
+
+    {
+    id: "52",
+    name: "Avura original",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 37000,
+    note: "Talles en cada foto", 
+    images: [
+      "Avura original 1.jpeg", 
+      "Avura original 2.jpeg",
+      "Avura original 3.jpeg",
+    ]
+  },
+
+    {
+    id: "51",
+    name: "Botas John",
+    category: "Mujer/Hombre",
+    type: "Bota",
+    price: 43000,
+    note: "Talles en cada foto", 
+    images: [
+      "Botas John 1.jpeg", 
+      "Botas John 2.jpeg", 
+    ]
+  },
+
+    {
+    id: "50",
+    name: "Bota de trabajo",
+    category: "Mujer/Hombre",
+    type: "Bota",
+    price: 35000,
+    note: "Talles del 38 al 45 - De cuero", 
+    images: [
+      "Bota de trabajo.jpeg", 
+    ]
+  },
+ 
+
+ {
+    id: "49",
+    name: "Zapatillas modelo bebes",
+    category: "Bebes",
+    type: "Zapatillas",
+    price: 23000,
+    note: "Talles disponibles en cada foto", 
+    images: [
+      "Zapatillas modelo bebes 1.jpeg",
+      "Zapatillas modelo bebes 2.jpeg",
+      "Zapatillas modelo bebes 3.jpeg",
+      "Zapatillas modelo bebes 4.jpeg",
+      "Zapatillas modelo bebes 5.jpeg",
+      "Zapatillas modelo bebes 6.jpeg",
+      "Zapatillas modelo bebes 7.jpeg",
+      "Zapatillas modelo bebes 8.jpeg",
+      "Zapatillas modelo bebes 9.jpeg",
+      "Zapatillas modelo bebes 10.jpeg",
+      "Zapatillas modelo bebes 11.jpeg",
+      "Zapatillas modelo bebes 12.jpeg",
+      "Zapatillas modelo bebes 13.jpeg",
+      "Zapatillas modelo bebes 14.jpeg",
+      "Zapatillas modelo bebes 15.jpeg",
+      "Zapatillas modelo bebes 16.jpeg",
+      "Zapatillas modelo bebes 17.jpeg",
+      "Zapatillas modelo bebes 18.jpeg",
+      "Zapatillas modelo bebes 19.jpeg",
+      "Zapatillas modelo bebes 20.jpeg",
+      "Zapatillas modelo bebes 21.jpeg",
+      "Zapatillas modelo bebes 22.jpeg",
+      "Zapatillas modelo bebes 23.jpeg",
+      "Zapatillas modelo bebes 24.jpeg",
+      "Zapatillas modelo bebes 25.jpeg",
+      "Zapatillas modelo bebes 26.jpeg",
+      "Zapatillas modelo bebes 27.jpeg",
+      "Zapatillas modelo bebes 28.jpeg",
+      "Zapatillas modelo bebes 29.jpeg",
+      "Zapatillas modelo bebes 30.jpeg",
+    ]
+  },
+
+        {
+    id: "47",
+    name: "Winner/Olimpica",
+    category: "Mujer/Hombre",
+    type: "Botines",
+    price: 41000,
+    note: "Talles del 38 al 43 - Cuero sintético", 
+    images: [
+      "botines WinnerOlimpica 1.jpeg",
+      "botines WinnerOlimpica 2.jpeg",
+      "botines WinnerOlimpica 3.jpeg",
+      "botines WinnerOlimpica 4.jpeg",
+      "botines WinnerOlimpica 5.jpeg",
+      "botines WinnerOlimpica 6.jpeg",
+      "botines WinnerOlimpica 7.jpeg",
+      "Video botines WinnerOlimpica.mp4",  
+    ]
+  },
+
+
+       {
+    id: "46",
+    name: "Nike Air force",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 29800,
+    note: "Talles del 34 al 43", 
+    images: [
+      "Nike Air force 1.jpeg",
+      "Nike Air force 2.jpeg",
+    ]
+  },
+
+    {
+    id: "45",
+    name: "Vans Total Black",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 31000,
+    note: "Talles del 34 al 43", 
+    images: [
+      "Vans Total Black 1.jpeg",
+    ]
+  },
+
+    {
+    id: "44",
+    name: "Dijean NB2000- NEW BALANCE 9060",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 55000,
+    note: "Talles del 34 al 39", 
+    images: [
+      "NB2000- NEW BALANCE 9060 1.jpeg",
+      "NB2000- NEW BALANCE 9060 2.jpeg",
+    ]
+  },
+
+    {
+    id: "43",
+    name: "Dijean original",
+    category: "Mujer",
+    type: "Zandalias",
+    price: 57800,
+    note: "Talles del 35 al 40 - Super livianas", 
+    images: [
+      "Dijean original 1.jpeg",
+      "Dijean original 2.jpeg",
+      "Dijean original 3.jpeg",
+    ]
+  },
+
+    {
+    id: "42",
+    name: "Caterpillar",
+    category: "Hombre",
+    type: "Zapatillas",
+    price: 41000,
+    note: "Talles en cada foto",
+    images: [
+      "Caterpillar 1.jpeg",
+      "Caterpillar 2.jpeg",
+      "Caterpillar 3.jpeg",
+    ]
+  },
+
+     {
+    id: "41",
+    name: "DUNK PREMIUM",
+    category: "Hombre",
+    type: "Zapatillas",
+    price: 47000,
+    note: "Talles del 38 al 43",
+    images: [
+      "DUNK PREMIUM 1.jpeg",
+      "DUNK PREMIUM 2.jpeg",
+      "DUNK PREMIUM 3.jpeg",
+    ]
+  },
+
+      {
+    id: "40",
+    name: "CONVERSE",
+    category: "Mujer",
+    type: "Zapatillas",
+    price: 57000,
+    note: "Talles del 34 al 39",
+    images: [
+      "CONVERSE 1.jpeg",
+    ]
+  },
+
+    {
+    id: "39",
+    name: "LOUIS VUITTON",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 57000,
+    note: "Talles del 34 al 43",
+    images: [
+      "LOUIS VUITTON 1.jpeg",
+    ]
+  },
+
+    {
+    id: "38",
+    name: "Puma Suede",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 41000,
+    note: "Talles del 34 al 43",
+    images: [
+      "Puma Suede 1.jpeg",
+    ]
+  },
+
+       {
+    id: "37",
+    name: "Topper",
+    category: "Mujer/Hombre",
+    type: "Zapatillas",
+    price: 35000,
+    note: "Talles a elejir en la foto",
+    images: [
+      "Topper 1.jpeg",
+    ]
+  },
+
+      {
+    id: "36",
+    name: "Adidas Samba",
+    category: "Mujer",
+    type: "Zapatillas",
+    price: 44800,
+    note: "Talles disponibles en cada foto",
+    images: [
+      "Adidas Samba 1.jpeg",
+      "Adidas Samba 2.jpeg",
+      "Adidas Samba 3.jpeg",
+      "Adidas Samba 4.jpeg",
+      "Adidas Samba 5.jpeg", 
+      "Adidas Samba 6.jpeg",
+      "Adidas Samba 7.jpeg",
+    ]
+  },
+
+      {
+    id: "35",
+    name: "NIKE ZOOM REACT",
+    category: "Hombre",
+    type: "Zapatillas",
+    price: 52200,
+    note: "Tallle del 38 al 43",
+    images: [
+      "NIKE ZOOM REACT 1.jpeg",
+      "NIKE ZOOM REACT 2.jpeg",
+      
+    ]
+  },
+
+      {
+    id: "34",
+    name: "NIKE AIR MAX TN 2",
+    category: "Hombre",
+    type: "Zapatillas",
+    price: 45000,
+    note: "Tallle del 38 al 43",
+    images: [
+      "WhatsApp Image 2025-12-30 at 11.40.30.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.31.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.32.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.33.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.34.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.35.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.36.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.37.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.38.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.39.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.40.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.41.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.42.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.43.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.40.44.jpeg",
+
+      
+    ]
+  },
+
+    {
+    id: "33",
+    name: "Nike Air force Blanca",
+    category: "Hombre/Mujer",
+    type: "Zapatillas",
+    price: 31000,
+    note: "Tallle del 34 al 43",
+    images: [
+      "WhatsApp Image 2025-12-30 at 11.52.06.jpeg",
+      
+    ]
+  },
+
+    {
+    id: "32",
+    name: "Nike",
+    category: "Hombre/Mujer",
+    type: "Zapatillas",
+    price: 31000,
+    note: "Tallle del 38 al 43",
+    images: [
+      "WhatsApp Image 2025-12-30 at 11.52.55.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.52.56.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.52.57.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.52.58.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.52.59.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.52.60.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.52.61.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.52.62.jpeg",
+      
+    ]
+  },
+
+    {
+    id: "31",
+    name: "Adidas",
+    category: "Hombre/Mujer",
+    type: "Zapatillas",
+    price: 39000,
+    note: "Numero en cada foto",
+    images: [
+      "WhatsApp Image 2025-12-30 at 11.53.31.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.53.32.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.53.33.jpeg",
+      "WhatsApp Image 2025-12-30 at 11.53.34.jpeg"
+    ]
+  },
+
+{
+    id: "30",
+    name: "Baby kiss",
+    category: "Infantil",
+    type: "Zandalias",
+    price: 20000,
+    note: "Con Cajitas",
+    images: [
+      "IMG-20251217-WA01353.jpeg",
+      "IMG-20251217-WA01354.jpeg",
+    ]
+  },
+
+      {
+        id: "9",
+        name: "Zapatillas Topper",
+        category: "Hombre",
+        type: "Zapatillas",
+        brand: "Linea Premium",
+        price: 37000,
+        quality: [],
+        note: "Talles 38 al 43",
+        images: [
+          "IMG-20251215-WA0036.jpg"
+        ]
+      },
+
+      {
+        id: "10",
+        name: "Adidas Campus",
+        category: "Hombre/Mujer",
+        type: "Zapatillas",
+        brand: "Linea Premium",
+        price: 31000,
+        quality: [],
+        note: "Talles disponibles en la foto.",
+        images: [
+          "IMG-20251217-WA0007.jpg",
+          "IMG-20251217-WA0008.jpg",
+          "IMG-20251217-WA0009.jpg",
+          "IMG-20251217-WA0010.jpg",
+          "IMG-20251217-WA0011.jpg",
+          "IMG-20251217-WA0012.jpg",
+          "IMG-20251217-WA0013.jpg",
+          "IMG-20251217-WA0014.jpg",
+          "IMG-20251217-WA0015.jpg",
+          "IMG-20251217-WA0016.jpg",
+          "IMG-20251217-WA0017.jpg",
+          "IMG-20251217-WA0018.jpg",
+          "IMG-20251217-WA0019.jpg"
+        ]
+      },
+
+      {
+        id: "11",
+        name: "Borcego Caterpillar",
+        category: "Hombre",
+        type: "Borcego",
+        brand: "Linea Premium",
+        price: 36000,
+        quality: [],
+        note: "Talles 34 al 39",
+        images: [
+          "IMG-20251217-WA0020.jpg"
+        ]
+      },
+
+      {
+        id: "12",
+        name: "JORDANJ27",
+        category: "Hombre/Mujer",
+        type: "Zapatillas",
+        brand: "Jordan",
+        price: 53000,
+        quality: ["Premium", "Bolsita Personalizada"],
+        note: "Talles 34 al 39",
+        images: [
+          "IMG-20251217-WA0021.jpg"
+        ]
+      },
+
+      {
+        id: "13",
+        name: "Jordan",
+        category: "Hombre/Mujer",
+        type: "Zapatillas",
+        brand: "Jordan",
+        price: 35000,
+        quality: ["Premium"],
+        note: "Talles 34 al 38",
+        images: [
+          "IMG-20251217-WA0022.jpg"
+        ]
+      },
+
+      {
+        id: "1",
+        name: "Botines Infantil Campo",
+        category: "Infantil",
+        type: "Botines",
+        brand: "Nike",
+        price: 33000,
+        quality: ["Premium", "Súper Luxo"],
+        note: "Talles en cada foto 😉👆 (elegí la foto/opción)",
+        numbersHint: "ver en cada foto",
+        images: [
+          "IMG-20251217-WA0129.jpg",
+          "IMG-20251217-WA0130.jpg",
+          "IMG-20251217-WA0131.jpg",
+          "IMG-20251217-WA0132.jpg",
+          "IMG-20251217-WA0133.jpg",
+          "IMG-20251217-WA0134.jpg",
+          "IMG-20251217-WA0135.jpg"
+        ]
+      },
+
+      {
+        id: "2",
+        name: "Ojotas tipo slide",
+        category: "Mujer/Hombre",
+        type: "Ojotas",
+        brand: "Adidas/Nike",
+        price: 24000,
+        quality: ["Premium"],
+        note: "Suela MICRO EXPANDIDO PURO. Forrado y costurada. Super confortable. Óptima terminaciónes. FOTO REAL. TALLES: 38/38 al 42/43",
+        numbersHint: "ver en cada foto",
+        images: [
+          "IMG-20251216-WA0022.jpg",
+          "IMG-20251216-WA0023.jpg",
+          "IMG-20251216-WA0026.jpg",
+          "IMG-20251216-WA0027.jpg",
+          "IMG-20251216-WA0028.jpg",
+          "IMG-20251216-WA0029.jpg",
+          "IMG-20251216-WA0030.jpg",
+          "IMG-20251216-WA0031.jpg",
+          "IMG-20251216-WA0032.jpg",
+          "IMG-20251216-WA0033.jpg",
+          "IMG-20251216-WA0034.jpg",
+          "IMG-20251216-WA0035.jpg",
+          "IMG-20251216-WA0036.jpg",
+          "IMG-20251216-WA0037.jpg",
+          "IMG-20251216-WA0038.jpg"
+        ]
+      },
+
+      {
+        id: "3",
+        name: "Ojotas con bandas",
+        category: "Hombre",
+        type: "Ojotas",
+        brand: "Varios",
+        price: 18000,
+        quality: ["Premium"],
+        note: "37 al 48",
+        numbersHint: "ver en cada foto",
+        images: [
+          "IMG-20251212-WA0064.jpg",
+          "IMG-20251212-WA0065.jpg",
+          "IMG-20251212-WA0066.jpg",
+          "IMG-20251212-WA0067.jpg",
+          "IMG-20251212-WA0068.jpg",
+          "IMG-20251212-WA0069.jpg",
+          "IMG-20251212-WA0070.jpg",
+          "IMG-20251212-WA0071.jpg",
+          "IMG-20251212-WA0072.jpg",
+          "IMG-20251212-WA0073.jpg",
+          "IMG-20251212-WA0074.jpg",
+          "IMG-20251212-WA0075.jpg",
+          "IMG-20251212-WA0076.jpg",
+          "IMG-20251212-WA0077.jpg"
+        ]
+      },
+
+      {
+        id: "4",
+        name: "Ojotas con bandas en caja",
+        category: "Hombre/Mujer",
+        type: "Ojotas",
+        brand: "Havahianas",
+        price: 23000,
+        quality: ["Premium"],
+        note: "37 al 44",
+        numbersHint: "ver en cada foto",
+        images: [
+          "IMG-20251216-WA0021.jpg",
+          "IMG-20251216-WA0013.jpg",
+          "IMG-20251216-WA0014.jpg",
+          "IMG-20251216-WA0015.jpg",
+          "IMG-20251216-WA0016.jpg",
+          "IMG-20251216-WA0017.jpg"
+        ]
+      },
+
+      {
+        id: "5",
+        name: "Ojotas caterpillar",
+        category: "Hombre",
+        type: "Ojotas",
+        brand: "Caterpillar",
+        price: 29000,
+        quality: ["Premium"],
+        note: "37 al 44 Cuero costurado",
+        numbersHint: "Cuero costurado",
+        images: [
+          "IMG-20251212-WA0080.jpg",
+          "IMG-20251212-WA0081.jpg",
+          "IMG-20251212-WA0082.jpg"
+        ]
+      },
+
+      {
+        id: "6",
+        name: "ojotas/sandalias",
+        category: "Hombre/Mujer",
+        type: "Ojotas/sandalias",
+        brand: "Varios",
+        price: 23000,
+        quality: ["Premium"],
+        note: "Números disponibles solo los que estan en cada foto 👆. Últimos pares ☺",
+        images: [
+          "IMG-20251216-WA0095.jpg",
+          "IMG-20251216-WA0096.jpg",
+          "IMG-20251216-WA0100.jpg",
+          "IMG-20251216-WA0101.jpg",
+          "IMG-20251216-WA0102.jpg",
+          "IMG-20251216-WA0103.jpg",
+          "IMG-20251216-WA0104.jpg",
+          "IMG-20251216-WA0105.jpg",
+          "IMG-20251216-WA0106.jpg",
+          "IMG-20251216-WA0107.jpg",
+          "IMG-20251216-WA0108.jpg",
+          "IMG-20251216-WA0109.jpg",
+          "IMG-20251216-WA0110.jpg",
+          "IMG-20251216-WA0111.jpg",
+          "IMG-20251216-WA0112.jpg",
+          "IMG-20251216-WA0113.jpg",
+          "IMG-20251216-WA0114.jpg",
+          "IMG-20251216-WA0115.jpg",
+          "IMG-20251216-WA0116.jpg",
+          "IMG-20251216-WA0117.jpg",
+          "IMG-20251216-WA0118.jpg",
+          "IMG-20251216-WA0119.jpg",
+          "IMG-20251216-WA0120.jpg",
+          "IMG-20251216-WA0121.jpg",
+          "IMG-20251216-WA0122.jpg",
+          "IMG-20251216-WA0123.jpg",
+          "IMG-20251216-WA0124.jpg",
+          "IMG-20251216-WA0125.jpg",
+          "IMG-20251216-WA0126.jpg",
+          "IMG-20251216-WA0127.jpg"
+        ]
+      },
+
+      {
+        id: "14",
+        name: "Zapatillas Vanz Knu",
+        category: "Hombre/Mujer",
+        type: "Zapatillas",
+        brand: "Vanz Knu",
+        price: 44000,
+        quality: ["Premium", "Plantilla en gel", "Papel seda", "Cordones gruesos"],
+        note: "Talles en cada foto 🥳",
+        images: [
+          "IMG-20251215-WA0066.jpg",
+          "IMG-20251215-WA0068.jpg",
+          "IMG-20251215-WA0067.jpg",
+          "IMG-20251215-WA0069.jpg",
+          "IMG-20251215-WA0070.jpg",
+          "IMG-20251215-WA0071.jpg"
+        ]
+      },
+
+      {
+        id: "7",
+        name: "Zapatillas Vanz U Upland",
+        category: "Hombre/Mujer",
+        type: "Zapatillas",
+        brand: "Vanz U Upland",
+        price: 45000,
+        quality: ["Premium"],
+        note: "Talles 34 al 43 excepto las ultimas dos solo hasta el 39",
+        images: [
+          "IMG-20251215-WA0072.jpg",
+          "IMG-20251215-WA0073.jpg",
+          "IMG-20251215-WA0074.jpg",
+          "IMG-20251215-WA0075.jpg",
+          "IMG-20251215-WA0076.jpg"
+        ]
+      },
+
+      {
+        id: "8",
+        name: "Zapatillas Puma",
+        category: "Hombre/Mujer",
+        type: "Zapatillas",
+        brand: "Linea Premium",
+        price: 39000,
+        quality: [],
+        note: "Talles 34 al 39",
+        images: [
+          "IMG-20251215-WA0030.jpg",
+          "IMG-20251215-WA0035.jpg",
+          "IMG-20251215-WA0032.jpg",
+          "IMG-20251215-WA0033.jpg",
+          "IMG-20251215-WA0034.jpg",
+          "IMG-20251215-WA0026.jpg"
+        ]
+      }
+
+
+    ];
+
+    // ================
+    // helpers
+    // ================
+    const $ = (s) => document.querySelector(s);
+
+    const fmtARS = (n) => {
+      try {
+        return new Intl.NumberFormat("es-AR", { style:"currency", currency:"ARS", maximumFractionDigits:0 }).format(n);
+      } catch {
+        return "$" + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+    };
+
+    function uniqSorted(arr){
+      return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function isVideo(src){
+      return /\.(mp4|webm|ogg)$/i.test(String(src || ""));
+    }
+
+    function buildWhatsAppLink(p, selectedIndex){
+      const opt = (typeof selectedIndex === "number") ? (selectedIndex + 1) : 1;
+
+      const qualities = (p.quality && p.quality.length)
+        ? `Calidad: ${p.quality.join(" / ")}`
+        : "";
+
+      const msg = [
+        "Hola! Quiero reservar:",
+        `• Modelo: ${p.name}`,
+        `• Marca: ${p.brand}`,
+        `• Precio: ${fmtARS(p.price)}`,
+        qualities ? `• ${qualities}` : "",
+        `• Opción (foto/video): #${opt}`,
+        "",
+        "Te mando captura del color/opción que quiero."
+      ].filter(Boolean).join("\n");
+
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function heroMediaHTML(src, alt){
+      const safeSrc = escapeHtml(src);
+      const safeAlt = escapeHtml(alt || "");
+      if(isVideo(src)){
+        // muted/autoplay/loop para que se vea “vivo” en la card (si el celu lo permite)
+        return `<video src="${safeSrc}" muted autoplay loop playsinline preload="metadata"></video>`;
+      }
+      return `<img src="${safeSrc}" alt="${safeAlt}" />`;
+    }
+
+    function thumbMediaHTML(src, label){
+      const safeSrc = escapeHtml(src);
+      const safeLabel = escapeHtml(label || "");
+      if(isVideo(src)){
+        return `
+          <video src="${safeSrc}" muted playsinline preload="metadata"></video>
+          <div class="playBadge">▶</div>
+        `;
+      }
+      return `<img src="${safeSrc}" alt="${safeLabel}">`;
+    }
+
+    function renderModalMedia(container, src, altText){
+      const safeSrc = escapeHtml(src || "");
+      const safeAlt = escapeHtml(altText || "Media");
+
+      // limpia lo anterior (y corta video anterior)
+      container.innerHTML = "";
+
+      if(!src) return;
+
+      if(isVideo(src)){
+        const v = document.createElement("video");
+        v.src = src;
+        v.controls = true;
+        v.autoplay = true;
+        v.playsInline = true;
+        v.preload = "metadata";
+        container.appendChild(v);
+      } else {
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = safeAlt;
+        container.appendChild(img);
+      }
+    }
+
+    // ================
+    // state
+    // ================
+    const state = {
+      q: "",
+      cat: "",
+      type: "",
+      brand: "",
+      selectedImage: {} // productId -> index
+    };
+
+    // ================
+    // UI
+    // ================
+    function fillSelects(){
+      const cats = uniqSorted(PRODUCTS.map(p=>p.category));
+      const types = uniqSorted(PRODUCTS.map(p=>p.type));
+      const brands = uniqSorted(PRODUCTS.map(p=>p.brand));
+
+      const $cat = $("#cat");
+      const $type = $("#type");
+      const $brand = $("#brand");
+
+      cats.forEach(v=>{
+        const o = document.createElement("option");
+        o.value = v; o.textContent = v;
+        $cat.appendChild(o);
+      });
+      types.forEach(v=>{
+        const o = document.createElement("option");
+        o.value = v; o.textContent = v;
+        $type.appendChild(o);
+      });
+      brands.forEach(v=>{
+        const o = document.createElement("option");
+        o.value = v; o.textContent = v;
+        $brand.appendChild(o);
+      });
+    }
+
+    function matches(p){
+      const q = state.q.trim().toLowerCase();
+      if(q){
+        const hay = [
+          p.name, p.category, p.type, p.brand,
+          ...(p.quality || [])
+        ].join(" ").toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      if(state.cat && p.category !== state.cat) return false;
+      if(state.type && p.type !== state.type) return false;
+      if(state.brand && p.brand !== state.brand) return false;
+      return true;
+    }
+
+    // =========================================================
+    // ✅ MODAL: back button + swipe
+    // =========================================================
+    let modalOpen = false;
+    let ignoreNextPop = false;
+
+    let currentModalProduct = null;
+    let currentModalIndex = 0;
+
+    const swipe = {
+      xStart: 0,
+      yStart: 0,
+      xEnd: 0,
+      yEnd: 0,
+      active: false
+    };
+
+    function renderModal(){
+      const modal = $("#modal");
+      const title = $("#modalTitle");
+      const media = $("#modalMedia");
+      const thumbs = $("#modalThumbs");
+
+      if(!currentModalProduct){
+        // por las dudas
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden","true");
+        modalOpen = false;
+        return;
+      }
+
+      const p = currentModalProduct;
+      const items = (p.images && p.images.length) ? p.images : [];
+      if(!items.length) return;
+
+      // clamp index
+      if(currentModalIndex < 0) currentModalIndex = 0;
+      if(currentModalIndex > items.length - 1) currentModalIndex = items.length - 1;
+
+      title.textContent = `${p.name} — Opción ${currentModalIndex + 1}`;
+
+      // media principal
+      const src = items[currentModalIndex];
+      renderModalMedia(media, src, p.name);
+
+      // thumbs
+      thumbs.innerHTML = "";
+      items.forEach((srcThumb, i)=>{
+        const d = document.createElement("div");
+        d.className = "thumb " + (i===currentModalIndex ? "active" : "");
+        d.innerHTML = thumbMediaHTML(srcThumb, `Opción ${i+1}`);
+        d.addEventListener("click", ()=>{
+          currentModalIndex = i;
+          state.selectedImage[p.id] = i;
+          renderModal();
+        });
+        thumbs.appendChild(d);
+      });
+    }
+
+    function openModal(p, startIdx){
+      const modal = $("#modal");
+
+      currentModalProduct = p;
+      const items = (p.images && p.images.length) ? p.images : [];
+      const max = Math.max(0, items.length - 1);
+
+      currentModalIndex = Math.max(0, Math.min(startIdx || 0, max));
+      state.selectedImage[p.id] = currentModalIndex;
+
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden","false");
+      modalOpen = true;
+
+      renderModal();
+
+      // Empujar historial para que el botón "atrás" cierre modal
+      if(!ignoreNextPop){
+        history.pushState({ modal: true }, "", location.href);
+      }
+      ignoreNextPop = false;
+    }
+
+    function closeModal(fromPopstate){
+      const modal = $("#modal");
+      if(!modalOpen) return;
+
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden","true");
+      modalOpen = false;
+
+      // limpiar media (corta video)
+      $("#modalMedia").innerHTML = "";
+      $("#modalThumbs").innerHTML = "";
+
+      currentModalProduct = null;
+      currentModalIndex = 0;
+
+      // Si se cerró manualmente, volvemos 1 paso para limpiar el pushState
+      if(!fromPopstate){
+        ignoreNextPop = true;
+        history.back();
+      }
+    }
+
+    // Botón atrás del celu: si modal está abierto, cerrar (sin salir de la web)
+    window.addEventListener("popstate", ()=>{
+      if(modalOpen){
+        closeModal(true);
+      }
+    });
+
+    // Swipe dentro del modal
+    function goPrev(){
+      if(!modalOpen || !currentModalProduct) return;
+      const items = currentModalProduct.images || [];
+      if(!items.length) return;
+      currentModalIndex = Math.max(0, currentModalIndex - 1);
+      state.selectedImage[currentModalProduct.id] = currentModalIndex;
+      renderModal();
+    }
+
+    function goNext(){
+      if(!modalOpen || !currentModalProduct) return;
+      const items = currentModalProduct.images || [];
+      if(!items.length) return;
+      currentModalIndex = Math.min(items.length - 1, currentModalIndex + 1);
+      state.selectedImage[currentModalProduct.id] = currentModalIndex;
+      renderModal();
+    }
+
+    function wireSwipe(){
+      const area = $("#modalMedia");
+
+      const threshold = 45;     // px
+      const restraint = 80;     // tolerancia vertical
+
+      // Touch
+      area.addEventListener("touchstart", (e)=>{
+        if(!modalOpen) return;
+        const t = e.changedTouches[0];
+        swipe.xStart = t.screenX;
+        swipe.yStart = t.screenY;
+        swipe.xEnd = t.screenX;
+        swipe.yEnd = t.screenY;
+        swipe.active = true;
+      }, { passive: true });
+
+      area.addEventListener("touchmove", (e)=>{
+        if(!modalOpen || !swipe.active) return;
+        const t = e.changedTouches[0];
+        swipe.xEnd = t.screenX;
+        swipe.yEnd = t.screenY;
+      }, { passive: true });
+
+      area.addEventListener("touchend", ()=>{
+        if(!modalOpen || !swipe.active) return;
+        swipe.active = false;
+
+        const dx = swipe.xEnd - swipe.xStart;
+        const dy = Math.abs(swipe.yEnd - swipe.yStart);
+
+        if(dy > restraint) return; // era scroll vertical
+        if(Math.abs(dx) < threshold) return;
+
+        if(dx < 0) goNext(); // swipe izquierda -> next
+        else goPrev();       // swipe derecha -> prev
+      });
+
+      // Mouse (arrastre)
+      let mouseDown = false;
+      area.addEventListener("mousedown", (e)=>{
+        if(!modalOpen) return;
+        mouseDown = true;
+        swipe.xStart = e.screenX;
+        swipe.yStart = e.screenY;
+        swipe.xEnd = e.screenX;
+        swipe.yEnd = e.screenY;
+      });
+
+      window.addEventListener("mousemove", (e)=>{
+        if(!modalOpen || !mouseDown) return;
+        swipe.xEnd = e.screenX;
+        swipe.yEnd = e.screenY;
+      });
+
+      window.addEventListener("mouseup", ()=>{
+        if(!modalOpen || !mouseDown) return;
+        mouseDown = false;
+
+        const dx = swipe.xEnd - swipe.xStart;
+        const dy = Math.abs(swipe.yEnd - swipe.yStart);
+
+        if(dy > 80) return;
+        if(Math.abs(dx) < 60) return;
+
+        if(dx < 0) goNext();
+        else goPrev();
+      });
+    }
+
+    // Render principal
+    function render(){
+      const list = PRODUCTS.filter(matches);
+      const grid = $("#grid");
+      grid.innerHTML = "";
+
+      list.forEach(p=>{
+        if(state.selectedImage[p.id] == null) state.selectedImage[p.id] = 0;
+
+        const items = (p.images && p.images.length) ? p.images : [];
+        const max = Math.max(0, items.length - 1);
+
+        const active = Math.max(0, Math.min(state.selectedImage[p.id], max));
+        state.selectedImage[p.id] = active;
+
+        const heroSrc = items[active] || "";
+
+        const qualities = (p.quality && p.quality.length) ? p.quality : [];
+        const tagHTML = [
+          p.category ? `<span class="tag">${escapeHtml(p.category)}</span>` : "",
+          p.type ? `<span class="tag">${escapeHtml(p.type)}</span>` : "",
+          p.brand ? `<span class="tag">${escapeHtml(p.brand)}</span>` : "",
+          ...qualities.map(q => `<span class="tag">${escapeHtml(q)}</span>`)
+        ].filter(Boolean).join("");
+
+        const card = document.createElement("article");
+        card.className = "card";
+
+        card.innerHTML = `
+          <div class="hero" data-open="1">
+            ${heroSrc ? heroMediaHTML(heroSrc, p.name) : ""}
+          </div>
+
+          ${items.length > 1 ? `
+            <div class="thumbs">
+              ${items.map((src, idx)=>`
+                <div class="thumb ${idx===active?'active':''}" data-idx="${idx}" title="Opción ${idx+1}">
+                  ${thumbMediaHTML(src, `Opción ${idx+1}`)}
+                </div>
+              `).join("")}
+            </div>
+          ` : `<div style="height:6px"></div>`}
+
+          <div class="content">
+            <div class="tagrow">${tagHTML}</div>
+
+            <div class="name">${escapeHtml(p.name)}</div>
+            <p class="note">${escapeHtml(p.note || "")}</p>
+
+            <div class="priceRow">
+              <div>
+                <div class="priceLabel">Precio</div>
+                <div class="price">${escapeHtml(fmtARS(p.price))}</div>
+              </div>
+              <div class="rightHint">
+                <div>Elegí la foto/opción</div>
+                <div style="opacity:.85">y reservá por WhatsApp</div>
+              </div>
+            </div>
+
+            <button class="btn" data-wa="1">Reservar por WhatsApp</button>
+          </div>
+        `;
+
+        // thumbs
+        const thumbs = card.querySelectorAll(".thumb");
+        thumbs.forEach(t=>{
+          t.addEventListener("click", ()=>{
+            const idx = Number(t.getAttribute("data-idx"));
+            state.selectedImage[p.id] = idx;
+            render();
+          });
+        });
+
+        // open modal
+        const hero = card.querySelector(".hero");
+        if(hero){
+          hero.addEventListener("click", ()=>{
+            openModal(p, state.selectedImage[p.id] || 0);
+          });
+        }
+
+        // WhatsApp
+        const btn = card.querySelector("[data-wa='1']");
+        btn.addEventListener("click", ()=>{
+          const link = buildWhatsAppLink(p, state.selectedImage[p.id]);
+          window.open(link, "_blank", "noopener,noreferrer");
+        });
+
+        grid.appendChild(card);
+      });
+
+      if(!list.length){
+        const empty = document.createElement("div");
+        empty.className = "card";
+        empty.innerHTML = `
+          <div class="content">
+            <div class="name">No se encontraron productos</div>
+            <p class="note">Probá con otra palabra o limpiá los filtros.</p>
+          </div>
+        `;
+        grid.appendChild(empty);
+      }
+    }
+
+    // Controls
+    function wireControls(){
+      $("#q").addEventListener("input", (e)=>{
+        state.q = e.target.value;
+        render();
+      });
+      $("#cat").addEventListener("change", (e)=>{
+        state.cat = e.target.value;
+        render();
+      });
+      $("#type").addEventListener("change", (e)=>{
+        state.type = e.target.value;
+        render();
+      });
+      $("#brand").addEventListener("change", (e)=>{
+        state.brand = e.target.value;
+        render();
+      });
+
+      $("#closeModal").addEventListener("click", ()=>closeModal(false));
+      $("#modal").addEventListener("click", (e)=>{
+        if(e.target && e.target.id === "modal") closeModal(false);
+      });
+      window.addEventListener("keydown", (e)=>{
+        if(e.key === "Escape") closeModal(false);
+      });
+    }
+
+    // Init
+    fillSelects();
+    wireControls();
+    wireSwipe();
+    render();
+  </script>
+
+  <!--
+  ============================================================
+  ✅ CÓMO AGREGAR VIDEOS (sin cambiar tu estructura)
+  - En "images": podés mezclar JPG/PNG + MP4
+  - Ejemplo:
+    images: [
+      "IMG-1.jpg",
+      "VID-1.mp4",
+      "IMG-2.jpg"
+    ]
+  - El video debe estar subido donde subís las fotos (misma carpeta/ruta)
+  ============================================================
+  -->
+</body>
+</html>
