@@ -32,6 +32,13 @@
     }
     a{color:inherit}
 
+    /* ✅ UX mobile: cuando el modal está abierto, bloqueamos el fondo */
+    body.modalLock{
+      overflow: hidden;
+      overscroll-behavior: contain;
+      touch-action: none;
+    }
+
     header{
       position: sticky;
       top: 0;
@@ -336,7 +343,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      touch-action: pan-y; /* permite scroll vertical del navegador, pero swipe horizontal lo manejamos nosotros */
+      touch-action: pan-y; /* scroll vertical ok, swipe horizontal lo manejamos nosotros */
     }
     .modalMedia img, .modalMedia video{
       max-width:100%;
@@ -406,35 +413,46 @@
         <button class="xbtn" id="closeModal">Cerrar ✕</button>
       </div>
 
-      <!-- 👇 acá se renderiza IMG o VIDEO -->
       <div id="modalMedia" class="modalMedia"></div>
-
       <div id="modalThumbs" class="modalThumbs"></div>
     </div>
   </div>
 
   <script>
-    //  WhatsApp (con prefijo país Argentina 54)
+    // WhatsApp (con prefijo país Argentina 54)
     const WHATSAPP_NUMBER = "5491167248975";
 
     const PRODUCTS = [
+      {
+        id: "84",
+        name: "Zapatos Fearnothi de cuero",
+        category: "Hombre",
+        type: "Zapato",
+        price: 35000,
+        note: "Talles en cada foto",
+        images: [
+          "ZapatosDeCuero 1.jpeg",
+          "ZapatosDeCuero 2.jpeg",
+          "ZapatosDeCuero 3.jpeg",
+          "ZapatosDeCuero 4.jpeg",
+        ]
+      },
+      {
+        id: "83",
+        name: "Adidas Samba infantil",
+        category: "Infantil",
+        type: "Zapatilla",
+        price: 29000,
+        note: "Talles en cada foto",
+        images: [
+          "Adidas Samba infantil 1.jpeg",
+          "Adidas Samba infantil 2.jpeg",
+          "Adidas Samba infantil 3.jpeg",
+          "Adidas Samba infantil 4.jpeg",
+        ]
+      },
 
-    {
-    id: "83",
-    name: "Adidas Samba infantil",
-    category: "Infantil",
-    type: "Zapatilla",
-    price: 29000,
-    note: "Talles en cada foto", 
-    images: [
-      "Adidas Samba infantil 1.jpeg",
-      "Adidas Samba infantil 2.jpeg",
-      "Adidas Samba infantil 3.jpeg", 
-      "Adidas Samba infantil 4.jpeg",
-    ]
-  },
-
-     {
+         {
     id: "82",
     name: "Adidas Supernova infantil",
     category: "Infantil",
@@ -1545,9 +1563,8 @@
           "IMG-20251215-WA0026.jpg"
         ]
       }
-
-
     ];
+
 
     // ================
     // helpers
@@ -1589,7 +1606,7 @@
       const msg = [
         "Hola! Quiero reservar:",
         `• Modelo: ${p.name}`,
-        `• Marca: ${p.brand}`,
+        `• Marca: ${p.brand || ""}`.trim(),
         `• Precio: ${fmtARS(p.price)}`,
         qualities ? `• ${qualities}` : "",
         `• Opción (foto/video): #${opt}`,
@@ -1604,10 +1621,9 @@
       const safeSrc = escapeHtml(src);
       const safeAlt = escapeHtml(alt || "");
       if(isVideo(src)){
-        // muted/autoplay/loop para que se vea “vivo” en la card (si el celu lo permite)
         return `<video src="${safeSrc}" muted autoplay loop playsinline preload="metadata"></video>`;
       }
-      return `<img src="${safeSrc}" alt="${safeAlt}" />`;
+      return `<img src="${safeSrc}" alt="${safeAlt}" loading="lazy" />`;
     }
 
     function thumbMediaHTML(src, label){
@@ -1619,16 +1635,11 @@
           <div class="playBadge">▶</div>
         `;
       }
-      return `<img src="${safeSrc}" alt="${safeLabel}">`;
+      return `<img src="${safeSrc}" alt="${safeLabel}" loading="lazy">`;
     }
 
     function renderModalMedia(container, src, altText){
-      const safeSrc = escapeHtml(src || "");
-      const safeAlt = escapeHtml(altText || "Media");
-
-      // limpia lo anterior (y corta video anterior)
       container.innerHTML = "";
-
       if(!src) return;
 
       if(isVideo(src)){
@@ -1642,7 +1653,7 @@
       } else {
         const img = document.createElement("img");
         img.src = src;
-        img.alt = safeAlt;
+        img.alt = altText || "Media";
         container.appendChild(img);
       }
     }
@@ -1658,9 +1669,264 @@
       selectedImage: {} // productId -> index
     };
 
-    // ================
-    // UI
-    // ================
+    function hasActiveFilters(){
+      return Boolean(
+        (state.q && state.q.trim()) ||
+        state.cat ||
+        state.type ||
+        state.brand
+      );
+    }
+
+    // =========================================================
+    // ✅ HISTORIAL (CATALOGO / FILTROS / MODAL) - MOBILE FRIENDLY
+    // =========================================================
+    let isRestoringFromHistory = false;
+    let filterHistoryTimer = null;
+
+    function setBaseHistoryIfNeeded(){
+      // reemplazamos el estado actual por "catalog" (no empuja stack)
+      if(!history.state || !history.state.view){
+        history.replaceState({ view:"catalog" }, "", location.pathname);
+      }
+    }
+
+    function scheduleFilterHistoryUpdate(){
+      // Evita empujar historial por cada letra tipeada:
+      // si ya está en "filters" → replaceState
+      // si pasa de "catalog" a "filters" → pushState 1 vez
+      clearTimeout(filterHistoryTimer);
+      filterHistoryTimer = setTimeout(()=>{
+        if(isRestoringFromHistory) return;
+
+        const active = hasActiveFilters();
+        const currentView = (history.state && history.state.view) ? history.state.view : "catalog";
+
+        if(active){
+          const payload = { view:"filters", q:state.q, cat:state.cat, type:state.type, brand:state.brand };
+
+          if(currentView === "filters"){
+            history.replaceState(payload, "", "#filtros");
+          } else {
+            history.pushState(payload, "", "#filtros");
+          }
+        } else {
+          // Volver a catalog limpio
+          if(currentView === "catalog"){
+            history.replaceState({ view:"catalog" }, "", location.pathname);
+          } else {
+            history.pushState({ view:"catalog" }, "", location.pathname);
+          }
+        }
+      }, 220);
+    }
+
+    // =========================================================
+    // ✅ MODAL: back button + swipe + historial
+    // =========================================================
+    let modalOpen = false;
+    let currentModalProduct = null;
+    let currentModalIndex = 0;
+
+    const swipe = {
+      xStart: 0, yStart: 0, xEnd: 0, yEnd: 0, active: false
+    };
+
+    function renderModal(){
+      const modal = $("#modal");
+      const title = $("#modalTitle");
+      const media = $("#modalMedia");
+      const thumbs = $("#modalThumbs");
+
+      if(!currentModalProduct){
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden","true");
+        modalOpen = false;
+        document.body.classList.remove("modalLock");
+        return;
+      }
+
+      const p = currentModalProduct;
+      const items = (p.images && p.images.length) ? p.images : [];
+      if(!items.length) return;
+
+      if(currentModalIndex < 0) currentModalIndex = 0;
+      if(currentModalIndex > items.length - 1) currentModalIndex = items.length - 1;
+
+      title.textContent = `${p.name} — Opción ${currentModalIndex + 1}`;
+
+      const src = items[currentModalIndex];
+      renderModalMedia(media, src, p.name);
+
+      thumbs.innerHTML = "";
+      items.forEach((srcThumb, i)=>{
+        const d = document.createElement("div");
+        d.className = "thumb " + (i===currentModalIndex ? "active" : "");
+        d.innerHTML = thumbMediaHTML(srcThumb, `Opción ${i+1}`);
+        d.addEventListener("click", ()=>{
+          currentModalIndex = i;
+          state.selectedImage[p.id] = i;
+          // mantenemos el modal pero actualizamos el state (sin empujar)
+          if(history.state && history.state.view === "modal"){
+            history.replaceState(
+              { ...history.state, index: currentModalIndex },
+              "",
+              location.hash || "#modal"
+            );
+          }
+          renderModal();
+        });
+        thumbs.appendChild(d);
+      });
+    }
+
+    function openModal(p, startIdx, fromHistory){
+      const modal = $("#modal");
+      currentModalProduct = p;
+
+      const items = (p.images && p.images.length) ? p.images : [];
+      const max = Math.max(0, items.length - 1);
+      currentModalIndex = Math.max(0, Math.min(startIdx || 0, max));
+      state.selectedImage[p.id] = currentModalIndex;
+
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden","false");
+      modalOpen = true;
+      document.body.classList.add("modalLock");
+
+      renderModal();
+
+      // ✅ Historial: empuja SOLO si lo abrimos manualmente
+      if(!fromHistory){
+        history.pushState(
+          {
+            view:"modal",
+            productId: p.id,
+            index: currentModalIndex
+          },
+          "",
+          "#modal"
+        );
+      }
+    }
+
+    function closeModal(fromPopstate){
+      const modal = $("#modal");
+      if(!modalOpen) return;
+
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden","true");
+      modalOpen = false;
+      document.body.classList.remove("modalLock");
+
+      $("#modalMedia").innerHTML = "";
+      $("#modalThumbs").innerHTML = "";
+
+      currentModalProduct = null;
+      currentModalIndex = 0;
+
+      // Si lo cerramos con botón/click afuera, volvemos 1 paso
+      if(!fromPopstate){
+        history.back();
+      }
+    }
+
+    // Swipe dentro del modal
+    function goPrev(){
+      if(!modalOpen || !currentModalProduct) return;
+      const items = currentModalProduct.images || [];
+      if(!items.length) return;
+      currentModalIndex = Math.max(0, currentModalIndex - 1);
+      state.selectedImage[currentModalProduct.id] = currentModalIndex;
+      if(history.state && history.state.view === "modal"){
+        history.replaceState({ ...history.state, index: currentModalIndex }, "", "#modal");
+      }
+      renderModal();
+    }
+
+    function goNext(){
+      if(!modalOpen || !currentModalProduct) return;
+      const items = currentModalProduct.images || [];
+      if(!items.length) return;
+      currentModalIndex = Math.min(items.length - 1, currentModalIndex + 1);
+      state.selectedImage[currentModalProduct.id] = currentModalIndex;
+      if(history.state && history.state.view === "modal"){
+        history.replaceState({ ...history.state, index: currentModalIndex }, "", "#modal");
+      }
+      renderModal();
+    }
+
+    function wireSwipe(){
+      const area = $("#modalMedia");
+      const threshold = 45;
+      const restraint = 80;
+
+      area.addEventListener("touchstart", (e)=>{
+        if(!modalOpen) return;
+        const t = e.changedTouches[0];
+        swipe.xStart = t.screenX;
+        swipe.yStart = t.screenY;
+        swipe.xEnd = t.screenX;
+        swipe.yEnd = t.screenY;
+        swipe.active = true;
+      }, { passive: true });
+
+      area.addEventListener("touchmove", (e)=>{
+        if(!modalOpen || !swipe.active) return;
+        const t = e.changedTouches[0];
+        swipe.xEnd = t.screenX;
+        swipe.yEnd = t.screenY;
+      }, { passive: true });
+
+      area.addEventListener("touchend", ()=>{
+        if(!modalOpen || !swipe.active) return;
+        swipe.active = false;
+
+        const dx = swipe.xEnd - swipe.xStart;
+        const dy = Math.abs(swipe.yEnd - swipe.yStart);
+
+        if(dy > restraint) return;
+        if(Math.abs(dx) < threshold) return;
+
+        if(dx < 0) goNext();
+        else goPrev();
+      });
+
+      // Mouse
+      let mouseDown = false;
+      area.addEventListener("mousedown", (e)=>{
+        if(!modalOpen) return;
+        mouseDown = true;
+        swipe.xStart = e.screenX;
+        swipe.yStart = e.screenY;
+        swipe.xEnd = e.screenX;
+        swipe.yEnd = e.screenY;
+      });
+
+      window.addEventListener("mousemove", (e)=>{
+        if(!modalOpen || !mouseDown) return;
+        swipe.xEnd = e.screenX;
+        swipe.yEnd = e.screenY;
+      });
+
+      window.addEventListener("mouseup", ()=>{
+        if(!modalOpen || !mouseDown) return;
+        mouseDown = false;
+
+        const dx = swipe.xEnd - swipe.xStart;
+        const dy = Math.abs(swipe.yEnd - swipe.yStart);
+
+        if(dy > 80) return;
+        if(Math.abs(dx) < 60) return;
+
+        if(dx < 0) goNext();
+        else goPrev();
+      });
+    }
+
+    // =========================================================
+    // FILTROS + RENDER
+    // =========================================================
     function fillSelects(){
       const cats = uniqSorted(PRODUCTS.map(p=>p.category));
       const types = uniqSorted(PRODUCTS.map(p=>p.type));
@@ -1702,208 +1968,6 @@
       return true;
     }
 
-    // =========================================================
-    // ✅ MODAL: back button + swipe
-    // =========================================================
-    let modalOpen = false;
-    let ignoreNextPop = false;
-
-    let currentModalProduct = null;
-    let currentModalIndex = 0;
-
-    const swipe = {
-      xStart: 0,
-      yStart: 0,
-      xEnd: 0,
-      yEnd: 0,
-      active: false
-    };
-
-    function renderModal(){
-      const modal = $("#modal");
-      const title = $("#modalTitle");
-      const media = $("#modalMedia");
-      const thumbs = $("#modalThumbs");
-
-      if(!currentModalProduct){
-        // por las dudas
-        modal.classList.remove("open");
-        modal.setAttribute("aria-hidden","true");
-        modalOpen = false;
-        return;
-      }
-
-      const p = currentModalProduct;
-      const items = (p.images && p.images.length) ? p.images : [];
-      if(!items.length) return;
-
-      // clamp index
-      if(currentModalIndex < 0) currentModalIndex = 0;
-      if(currentModalIndex > items.length - 1) currentModalIndex = items.length - 1;
-
-      title.textContent = `${p.name} — Opción ${currentModalIndex + 1}`;
-
-      // media principal
-      const src = items[currentModalIndex];
-      renderModalMedia(media, src, p.name);
-
-      // thumbs
-      thumbs.innerHTML = "";
-      items.forEach((srcThumb, i)=>{
-        const d = document.createElement("div");
-        d.className = "thumb " + (i===currentModalIndex ? "active" : "");
-        d.innerHTML = thumbMediaHTML(srcThumb, `Opción ${i+1}`);
-        d.addEventListener("click", ()=>{
-          currentModalIndex = i;
-          state.selectedImage[p.id] = i;
-          renderModal();
-        });
-        thumbs.appendChild(d);
-      });
-    }
-
-    function openModal(p, startIdx){
-      const modal = $("#modal");
-
-      currentModalProduct = p;
-      const items = (p.images && p.images.length) ? p.images : [];
-      const max = Math.max(0, items.length - 1);
-
-      currentModalIndex = Math.max(0, Math.min(startIdx || 0, max));
-      state.selectedImage[p.id] = currentModalIndex;
-
-      modal.classList.add("open");
-      modal.setAttribute("aria-hidden","false");
-      modalOpen = true;
-
-      renderModal();
-
-      // Empujar historial para que el botón "atrás" cierre modal
-      if(!ignoreNextPop){
-        history.pushState({ modal: true }, "", location.href);
-      }
-      ignoreNextPop = false;
-    }
-
-    function closeModal(fromPopstate){
-      const modal = $("#modal");
-      if(!modalOpen) return;
-
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden","true");
-      modalOpen = false;
-
-      // limpiar media (corta video)
-      $("#modalMedia").innerHTML = "";
-      $("#modalThumbs").innerHTML = "";
-
-      currentModalProduct = null;
-      currentModalIndex = 0;
-
-      // Si se cerró manualmente, volvemos 1 paso para limpiar el pushState
-      if(!fromPopstate){
-        ignoreNextPop = true;
-        history.back();
-      }
-    }
-
-    // Botón atrás del celu: si modal está abierto, cerrar (sin salir de la web)
-    window.addEventListener("popstate", ()=>{
-      if(modalOpen){
-        closeModal(true);
-      }
-    });
-
-    // Swipe dentro del modal
-    function goPrev(){
-      if(!modalOpen || !currentModalProduct) return;
-      const items = currentModalProduct.images || [];
-      if(!items.length) return;
-      currentModalIndex = Math.max(0, currentModalIndex - 1);
-      state.selectedImage[currentModalProduct.id] = currentModalIndex;
-      renderModal();
-    }
-
-    function goNext(){
-      if(!modalOpen || !currentModalProduct) return;
-      const items = currentModalProduct.images || [];
-      if(!items.length) return;
-      currentModalIndex = Math.min(items.length - 1, currentModalIndex + 1);
-      state.selectedImage[currentModalProduct.id] = currentModalIndex;
-      renderModal();
-    }
-
-    function wireSwipe(){
-      const area = $("#modalMedia");
-
-      const threshold = 45;     // px
-      const restraint = 80;     // tolerancia vertical
-
-      // Touch
-      area.addEventListener("touchstart", (e)=>{
-        if(!modalOpen) return;
-        const t = e.changedTouches[0];
-        swipe.xStart = t.screenX;
-        swipe.yStart = t.screenY;
-        swipe.xEnd = t.screenX;
-        swipe.yEnd = t.screenY;
-        swipe.active = true;
-      }, { passive: true });
-
-      area.addEventListener("touchmove", (e)=>{
-        if(!modalOpen || !swipe.active) return;
-        const t = e.changedTouches[0];
-        swipe.xEnd = t.screenX;
-        swipe.yEnd = t.screenY;
-      }, { passive: true });
-
-      area.addEventListener("touchend", ()=>{
-        if(!modalOpen || !swipe.active) return;
-        swipe.active = false;
-
-        const dx = swipe.xEnd - swipe.xStart;
-        const dy = Math.abs(swipe.yEnd - swipe.yStart);
-
-        if(dy > restraint) return; // era scroll vertical
-        if(Math.abs(dx) < threshold) return;
-
-        if(dx < 0) goNext(); // swipe izquierda -> next
-        else goPrev();       // swipe derecha -> prev
-      });
-
-      // Mouse (arrastre)
-      let mouseDown = false;
-      area.addEventListener("mousedown", (e)=>{
-        if(!modalOpen) return;
-        mouseDown = true;
-        swipe.xStart = e.screenX;
-        swipe.yStart = e.screenY;
-        swipe.xEnd = e.screenX;
-        swipe.yEnd = e.screenY;
-      });
-
-      window.addEventListener("mousemove", (e)=>{
-        if(!modalOpen || !mouseDown) return;
-        swipe.xEnd = e.screenX;
-        swipe.yEnd = e.screenY;
-      });
-
-      window.addEventListener("mouseup", ()=>{
-        if(!modalOpen || !mouseDown) return;
-        mouseDown = false;
-
-        const dx = swipe.xEnd - swipe.xStart;
-        const dy = Math.abs(swipe.yEnd - swipe.yStart);
-
-        if(dy > 80) return;
-        if(Math.abs(dx) < 60) return;
-
-        if(dx < 0) goNext();
-        else goPrev();
-      });
-    }
-
-    // Render principal
     function render(){
       const list = PRODUCTS.filter(matches);
       const grid = $("#grid");
@@ -1981,7 +2045,7 @@
         const hero = card.querySelector(".hero");
         if(hero){
           hero.addEventListener("click", ()=>{
-            openModal(p, state.selectedImage[p.id] || 0);
+            openModal(p, state.selectedImage[p.id] || 0, false);
           });
         }
 
@@ -2008,22 +2072,36 @@
       }
     }
 
+    function applyStateToInputs(){
+      $("#q").value = state.q || "";
+      $("#cat").value = state.cat || "";
+      $("#type").value = state.type || "";
+      $("#brand").value = state.brand || "";
+    }
+
     // Controls
     function wireControls(){
       $("#q").addEventListener("input", (e)=>{
         state.q = e.target.value;
+        scheduleFilterHistoryUpdate();
         render();
       });
+
       $("#cat").addEventListener("change", (e)=>{
         state.cat = e.target.value;
+        scheduleFilterHistoryUpdate();
         render();
       });
+
       $("#type").addEventListener("change", (e)=>{
         state.type = e.target.value;
+        scheduleFilterHistoryUpdate();
         render();
       });
+
       $("#brand").addEventListener("change", (e)=>{
         state.brand = e.target.value;
+        scheduleFilterHistoryUpdate();
         render();
       });
 
@@ -2031,17 +2109,79 @@
       $("#modal").addEventListener("click", (e)=>{
         if(e.target && e.target.id === "modal") closeModal(false);
       });
+
       window.addEventListener("keydown", (e)=>{
         if(e.key === "Escape") closeModal(false);
       });
     }
 
+    // =========================================================
+    // ✅ POPSTATE: esto es lo que arregla el "Atrás" del celular
+    // =========================================================
+    window.addEventListener("popstate", (e)=>{
+      const s = e.state;
+
+      isRestoringFromHistory = true;
+
+      // Si no hay estado, tratamos como catálogo limpio
+      if(!s || !s.view){
+        if(modalOpen) closeModal(true);
+        state.q = "";
+        state.cat = "";
+        state.type = "";
+        state.brand = "";
+        applyStateToInputs();
+        render();
+        isRestoringFromHistory = false;
+        return;
+      }
+
+      if(s.view === "modal"){
+        // Modal desde historial
+        const p = PRODUCTS.find(x => String(x.id) === String(s.productId));
+        if(p){
+          openModal(p, Number(s.index || 0), true);
+        }
+        isRestoringFromHistory = false;
+        return;
+      }
+
+      // Si veníamos del modal y el historial volvió a filters/catalog
+      if(modalOpen){
+        closeModal(true);
+      }
+
+      if(s.view === "filters"){
+        state.q = s.q || "";
+        state.cat = s.cat || "";
+        state.type = s.type || "";
+        state.brand = s.brand || "";
+        applyStateToInputs();
+        render();
+        isRestoringFromHistory = false;
+        return;
+      }
+
+      if(s.view === "catalog"){
+        state.q = "";
+        state.cat = "";
+        state.type = "";
+        state.brand = "";
+        applyStateToInputs();
+        render();
+        isRestoringFromHistory = false;
+        return;
+      }
+
+      isRestoringFromHistory = false;
+    });
+
     // Init
     fillSelects();
     wireControls();
     wireSwipe();
+    setBaseHistoryIfNeeded();
     render();
   </script>
 </body>
 </html>
-
